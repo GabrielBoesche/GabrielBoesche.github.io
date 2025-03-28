@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple Hello World page with proper SEO optimizations.">
+    <meta name="keywords" content="hello world, SEO, basic HTML">
+    <meta name="author" content="Your Name">
+    <title>Hello World</title>
+    <link rel="canonical" href="https://www.yourwebsite.com/">
+    <meta property="og:title" content="Hello World">
+    <meta property="og:description" content="A simple Hello World page with proper SEO optimizations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.yourwebsite.com/">
+    <meta property="og:image" content="https://www.yourwebsite.com/preview.jpg">
+    <meta name="robots" content="index, follow">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #0b0704;
+            text-align: left;
+            display: flex;
+            justify-content: center;
+
+            margin-top: -50px;
+            background: url('selfs/img0.jpeg');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            /* Full viewport height */
+            /* Horizontal centering */
+            align-items: center;
+            /* Vertical centering */
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        .carousel {
+            position: fixed;
+            /* Stays on top even when scrolling */
+            background-color: #0b0704;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 100;
+            /* Ensures it appears above everything */
+            content-visibility: auto;
+        }
+
+        .carousel-clickareas {
+            /*background-color: rgba(0.2, 0, 0.8, 0.8)*/
+            z-index: 1001;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            content-visibility: auto;
+
+        }
+
+        .carousel-lft-btn,
+        .carousel-rgt-btn {
+            z-index: 1002;
+            position: absolute;
+            width: 26%;
+            height: 100%;
+            top: 0;
+            content-visibility: auto;
+        }
+
+        .carousel-lft-btn {
+            /*background-color: #ff00ff;*/
+            background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+            left: 0;
+        }
+
+        .carousel-rgt-btn {
+            /*background-color: #00ff00;*/
+            background: linear-gradient(to left, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+            right: 0;
+        }
+
+        .carousel-a,
+        .carousel-b {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            content-visibility: auto;
+            background: url('tattoos/img0.jpeg');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .carousel-a {
+            /*background-color: rgba(255, 0, 0, 1);*/
+            /* Semi-transparent red */
+
+            /*top: 0%;*/
+            height: 100%;
+            z-index: 2;
+        }
+
+        .carousel-b {
+            /*background-color: rgba(0, 0, 255, 1);*/
+            /* Semi-transparent blue */
+            /*top:50%;*/
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="carousel">
+        <div class="carousel-clickareas"></div>
+        <div class="carousel-lft-btn"></div>
+        <div class="carousel-rgt-btn"></div>
+        <div class="carousel-a"></div>
+        <div class="carousel-b"></div>
+    </div>
+    <h1>Kamilla Boesche<br>
+        51 985 499 732
+    </h1>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+
+    let is_carousel_out_of_focus = false;
+    let is_at_frame_b = false;
+    let is_animating = false;
+    let vertical_scroll_accumulator = 0;
+    const animation_length_in_secs = 1.86;
+    const tattoo_images_count = 4;
+    const selfie_images_count = 4;
+    let current_frame_image_index = 0;
+    const max_zoom = 2.2;
+    const frame_a = getDomObjectByClassName('carousel-a');
+    const frame_b = getDomObjectByClassName('carousel-b');
+
+    function getTattoImgString(inputNumber) {
+        return 'tattoos/img' + inputNumber + '.png';
+    }
+    function getSelfImgString(inputNumber) {
+        return 'selfs/img' + inputNumber + '.jpeg';
+    }
+
+
+    function getDomObjectByClassName(className) {
+        return document.querySelector(`.${className}`);
+    }
+
+    function loadImageAsync(file) {
+        return new Promise((resolve) => {
+            const img = new Image();
+
+            img.onload = () => {
+                // Check if image has valid dimensions as an extra validation
+                if (img.width > 0 && img.height > 0) {
+                    resolve(img);
+                } else {
+                    resolve(null);
+                }
+            };
+
+            img.onerror = () => resolve(null);
+
+            // Start loading the image after setting up event listeners
+            img.src = file;
+        });
+    }
+
+    asynchronouslyLoadImage = function (path, inputFunction) {
+        loadImageAsync(path)
+            .then(image => {
+                if (image) {
+
+                    if (!is_at_frame_b) {
+                        gsap.set(frame_b, {
+                            backgroundImage: `url('${image.src}')`
+                        });
+                    } else if (is_at_frame_b) {
+                        gsap.set(frame_a, {
+                            backgroundImage: `url('${image.src}')`
+                        });
+                    }
+                    inputFunction();
+                    // Use the image
+                } else {
+
+                    console.log(path);
+                    // Handle failure
+                }
+            });
+
+    }
+
+    getCurrentFrame = function () {
+        if (is_at_frame_b) {
+            return frame_b;
+        }
+        else {
+            return frame_a;
+        }
+    }
+
+    animateCurrentImageBg = function () {
+        const currentFrame = getCurrentFrame();
+        gsap.fromTo(currentFrame,
+            {
+                backgroundPosition: "48% 30%"
+            },
+            {
+                backgroundPosition: "52% 70%",
+                duration: animation_length_in_secs * 10,
+                ease: "sine.inOut",
+                repeat: -1,
+                yoyo: true
+
+            }
+        );
+
+    }
+
+    animateNextImage = function() {
+    if (is_animating) return; // Prevent concurrent animations
+    vertical_scroll_accumulator = 0;
+    
+    // Determine which frames to use
+    const [fromFrame, toFrame] = is_at_frame_b 
+        ? [frame_b, frame_a] 
+        : [frame_a, frame_b];
+    
+    // Set initial states
+    gsap.set(toFrame, {
+        zIndex: 2,
+        opacity: 0,
+        y: "0%",
+        scale: 1
+        // x: "100%"  // Uncomment if needed
+    });
+    
+    gsap.set(fromFrame, {
+        zIndex: 1
+    });
+    
+    // Animate the active frame
+    gsap.to(toFrame, {
+        duration: animation_length_in_secs,
+        opacity: 1,
+        ease: "linear",
+        onComplete: () => {
+            is_animating = false;
+        }
+    });
+    gsap.to(toFrame, {
+        duration: animation_length_in_secs * 2,
+        scale: max_zoom,
+        ease: "power1.inOut",
+    });
+    
+    // Update state
+    is_at_frame_b = !is_at_frame_b;
+    is_animating = true;
+};
+
+
+    animatePreviousImage = function() {
+        if (is_animating) return; // Prevent overlapping animations
+        vertical_scroll_accumulator = 0;
+
+        const [activeFrame, inactiveFrame] = is_at_frame_b 
+            ? [frame_b, frame_a] 
+            : [frame_a, frame_b];
+        
+        // Set up initial states
+        gsap.set(inactiveFrame, {
+            zIndex: 2,
+            y: "0%",
+            opacity: 0,
+            scale: 1
+        });
+        
+        gsap.set(activeFrame, {
+            zIndex: 1
+        });
+        
+        // Animate the active frame
+        gsap.to(inactiveFrame, {
+            duration: animation_length_in_secs,
+            opacity: 1,
+            ease: "linear",
+            onComplete: () => {
+                is_animating = false;
+            }
+        });
+        gsap.to(inactiveFrame, {
+            duration: animation_length_in_secs * 2,
+            scale: max_zoom,
+            ease: "power1.inOut",
+        });
+        
+        // Toggle the state
+        is_at_frame_b = !is_at_frame_b;
+        is_animating = true;
+    };
+
+    nextCarouselImage = function () {
+
+        if (is_animating) {
+            return;
+        }
+        else {
+            current_frame_image_index = getSafeIndex(current_frame_image_index + 1, tattoo_images_count);
+        }
+
+        asynchronouslyLoadImage(getTattoImgString(current_frame_image_index), animateNextImage);
+
+    }
+
+
+    previousCarouselImage = function () {
+        if (is_animating) {
+            return;
+        }
+        else {
+            current_frame_image_index = getSafeIndex(current_frame_image_index - 1, tattoo_images_count);
+        }
+
+
+        asynchronouslyLoadImage(getTattoImgString(current_frame_image_index), animatePreviousImage);
+    }
+
+    function getSafeIndex(index, length) {
+        if (length <= 0) return [];
+        index = ((index % length) + length) % length;
+        return index;
+    }
+    snapCarouselToTop = function () {
+        if (is_carousel_out_of_focus) {
+            return;
+        }
+        const element = getDomObjectByClassName('carousel');
+        gsap.to(element, {
+            duration: animation_length_in_secs,
+            y: "-100%", // Move up by 50% of the element's height
+            ease: "power1.inOut"
+        });
+        is_carousel_out_of_focus = true;
+    }
+    snapCarouselToBottom = function () {
+        if (!is_carousel_out_of_focus) {
+            return;
+        }
+        const element = getDomObjectByClassName('carousel');
+        gsap.to(element, {
+            duration: animation_length_in_secs,
+            y: "0%", // Move up by 50% of the element's height
+            ease: "power1.inOut"
+        });
+        is_carousel_out_of_focus = false;
+    }
+
+    verticalScrolling = function (dist) {
+        if(is_animating){
+        return;
+        }
+        vertical_scroll_accumulator += dist * 0.01;
+        gsap.set(getCurrentFrame(),
+            {
+                y: vertical_scroll_accumulator + "%"
+            }
+        );
+        console.log('detect');
+
+        if (dist > 0 && !is_carousel_out_of_focus) {
+            //snapCarouselToTop();
+        }
+        else if (dist < 0 && is_carousel_out_of_focus) {
+            //snapCarouselToBottom();
+        }
+
+    }
+
+    arrowKeyPressed = function (key) {
+        if (key == 'ArrowUp' && !is_carousel_out_of_focus) {
+            verticalScrolling(30);
+        }
+        if (key == 'ArrowDown' && !is_carousel_out_of_focus) {
+            verticalScrolling(-30);
+            //snapCarouselToTop();
+        }
+        if (key == 'ArrowLeft' && !is_carousel_out_of_focus) {
+            previousCarouselImage();
+        }
+        if (key == 'ArrowRight' && !is_carousel_out_of_focus) {
+            nextCarouselImage();
+        }
+    }
+
+    let horizontal_touch_controller = 0;
+
+    scrolling = function (dx, dy) {
+        verticalScrolling(dy);
+    }
+
+    touchStart = function (dx, dy) {
+        horizontal_touch_controller = 0;
+    }
+
+    touchEnd = function (dx, dy) {
+        vertical_scroll_accumulator = 0;
+    }
+
+    function tryHorizontalDragging() {
+        if (is_at_frame_b) {
+            //animations_targets[2] = horizontal_touch_controller; 
+        }
+    }
+
+
+    touching = function (dx, dy) {
+        verticalScrolling(dy);
+    }
+
+    function clickLeftCarouselBtn() {
+        previousCarouselImage();
+    }
+    function clickRightCarouselBtn() {
+        nextCarouselImage();
+    }
+    function addCarouselButtonInterations() {
+        const leftBtn = getDomObjectByClassName('carousel-lft-btn');
+        const rightBtn = getDomObjectByClassName('carousel-rgt-btn');
+
+
+        leftBtn.addEventListener('click', clickLeftCarouselBtn);
+        rightBtn.addEventListener('click', clickRightCarouselBtn);
+    }
+
+    function setupScrollListeners(
+        onWheel = () => { },
+        onArrowKey = () => { },
+        onTouchMove = () => { },
+        onTouchStart = () => { },
+        onTouchEnd = () => { }
+    ) {
+        document.addEventListener('wheel', (event) => {
+            onWheel(event.deltaX, event.deltaY);
+        });
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (event) => {
+            touchStartX = event.touches[0].clientX;
+            touchStartY = event.touches[0].clientY;
+            onTouchStart(touchStartX, touchStartY);
+        });
+
+        document.addEventListener('touchmove', (event) => {
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let deltaX = touchStartX - touchEndX;
+            let deltaY = touchStartY - touchEndY;
+            onTouchMove(deltaX, deltaY);
+        });
+
+        document.addEventListener('touchend', (event) => {
+            let touchEndX = event.touches[0].clientX;
+            let touchEndY = event.touches[0].clientY;
+            let deltaX = touchStartX - touchEndX;
+            let deltaY = touchStartY - touchEndY;
+            onTouchEnd(deltaX, deltaY);
+        });
+
+
+        document.addEventListener('keydown', (event) => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+                onArrowKey(event.key);
+            }
+        });
+    }
+
+
+
+    setupScrollListeners(
+        (dx, dy) => scrolling(dx, dy * -1),
+        (key) => arrowKeyPressed(key),
+        (dx, dy) => touching(dx, dy),
+        (dx, dy) => touchStart(dx, dy),
+        (dx, dy) => touchEnd(dx, dy)
+    );
+    asynchronouslyLoadImage(getTattoImgString(current_frame_image_index), addCarouselButtonInterations);
+    //animateCurrentImageBg();
+
+</script>
+
+</html>
