@@ -20,26 +20,48 @@
             font-family: Arial, sans-serif;
             color: #0b0704;
             text-align: left;
-            display: flex;
+            display: block;
             justify-content: center;
 
-            margin-top: -50px;
-            background: url('selfs/img0.jpeg');
+            /*margin-top: -50px;*/
+            margin: 0;
+            padding: 0;
+            overflow-y: visible;
+            overflow-x: hidden;
+            /*background: url('selfs/img0.jpeg');*/
             background-size: cover;
             background-position: center;
-            min-height: 100vh;
+            height: 100vh;
             /* Full viewport height */
             /* Horizontal centering */
-            align-items: center;
+            /*align-items: center;*/
             /* Vertical centering */
         }
 
         h1 {
             margin-top: 50px;
         }
+        
+        /* MAIN CONTAINER (enforces snapping) */
+        .scroll-container {
+            height: 100vh; /* Full viewport height */
+            overflow-y: scroll; /* Enable scrolling */
+            scroll-snap-type: y proximity; /* Vertical snapping */
+            scroll-behavior: smooth; /* Smooth scrolling (optional) */
+        }
+
+        /* EACH SECTION (snap points) */
+        .scroll-section {
+            height: 100vh; /* Each section fills the screen */
+            scroll-snap-align: start; /* Snap to the top */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+        }
 
         .carousel {
-            position: fixed;
+            position: relative;
             /* Stays on top even when scrolling */
             background-color: #0b0704;
             top: 0;
@@ -47,7 +69,7 @@
             width: 100%;
             height: 100%;
             color: white;
-            padding: 10px;
+            /*padding: 10px; */
             text-align: center;
             z-index: 100;
             /* Ensures it appears above everything */
@@ -99,7 +121,7 @@
             align-items: center;
             justify-content: center;
             content-visibility: auto;
-            background: url('tattoos/img0.jpeg');
+            /*background: url('tattoos/img0.jpeg');*/
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -125,16 +147,22 @@
 </head>
 
 <body>
-    <div class="carousel">
-        <div class="carousel-clickareas"></div>
-        <div class="carousel-lft-btn"></div>
-        <div class="carousel-rgt-btn"></div>
-        <div class="carousel-a"></div>
-        <div class="carousel-b"></div>
+    <div class="scroll-container">
+        <div class="scroll-section" style="background: #f0f0f0;">
+            <div class="carousel">
+                <div class="carousel-clickareas"></div>
+                <div class="carousel-lft-btn"></div>
+                <div class="carousel-rgt-btn"></div>
+                <div class="carousel-a"></div>
+                <div class="carousel-b"></div>
+            </div>
+        </div>
+        <div class="scroll-section" style="background: #e0e0e0;">
+            <h1>Kamilla Boesche<br>
+                51 985 499 732
+            </h1>
+        </div>
     </div>
-    <h1>Kamilla Boesche<br>
-        51 985 499 732
-    </h1>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
@@ -142,7 +170,7 @@
     let is_carousel_out_of_focus = false;
     let is_at_frame_b = false;
     let is_animating = false;
-    let vertical_scroll_accumulator = 0;
+    let vertical_scroll_accumulator = 0.0;
     const animation_length_in_secs = 1.86;
     const tattoo_images_count = 4;
     const selfie_images_count = 4;
@@ -219,7 +247,7 @@
 
     animateCurrentImageBg = function () {
         const currentFrame = getCurrentFrame();
-        gsap.fromTo(currentFrame,
+        /*gsap.fromTo(currentFrame,
             {
                 backgroundPosition: "48% 30%"
             },
@@ -231,13 +259,13 @@
                 yoyo: true
 
             }
-        );
+        );*/
 
     }
 
     animateNextImage = function() {
     if (is_animating) return; // Prevent concurrent animations
-    vertical_scroll_accumulator = 0;
+    //vertical_scroll_accumulator = 0;
     
     // Determine which frames to use
     const [fromFrame, toFrame] = is_at_frame_b 
@@ -266,11 +294,6 @@
             is_animating = false;
         }
     });
-    gsap.to(toFrame, {
-        duration: animation_length_in_secs * 2,
-        scale: max_zoom,
-        ease: "power1.inOut",
-    });
     
     // Update state
     is_at_frame_b = !is_at_frame_b;
@@ -280,7 +303,7 @@
 
     animatePreviousImage = function() {
         if (is_animating) return; // Prevent overlapping animations
-        vertical_scroll_accumulator = 0;
+        //vertical_scroll_accumulator = 0;
 
         const [activeFrame, inactiveFrame] = is_at_frame_b 
             ? [frame_b, frame_a] 
@@ -306,11 +329,6 @@
             onComplete: () => {
                 is_animating = false;
             }
-        });
-        gsap.to(inactiveFrame, {
-            duration: animation_length_in_secs * 2,
-            scale: max_zoom,
-            ease: "power1.inOut",
         });
         
         // Toggle the state
@@ -376,15 +394,15 @@
 
     verticalScrolling = function (dist) {
         if(is_animating){
-        return;
+            return;
         }
         vertical_scroll_accumulator += dist * 0.01;
+        vertical_scroll_accumulator = Math.clamp(vertical_scroll_accumulator, 0, 100);
         gsap.set(getCurrentFrame(),
             {
                 y: vertical_scroll_accumulator + "%"
             }
         );
-        console.log('detect');
 
         if (dist > 0 && !is_carousel_out_of_focus) {
             //snapCarouselToTop();
@@ -422,7 +440,7 @@
     }
 
     touchEnd = function (dx, dy) {
-        vertical_scroll_accumulator = 0;
+        //vertical_scroll_accumulator = 0;
     }
 
     function tryHorizontalDragging() {
