@@ -81,8 +81,8 @@
         .carousel-btn-graphics-rgt{
             box-sizing: border-box;
             z-index: 1000;
-            width: 72px;
-            height: 72px;
+            width: 32px;
+            height: 32px;
             padding: 0;
             position: absolute;
             top: 50%;
@@ -97,11 +97,11 @@
         .carousel-btn-graphics-lft{
             /*background-color: #ff0000;*/
             transform: scaleX(-1);
-            left: 24px;
+            left: 2%;
         }
         .carousel-btn-graphics-rgt{
             /*background-color: #00ff00;*/
-            right: 24px;
+            right: 2%;
         }
 
         .carousel-clickareas {
@@ -155,7 +155,11 @@
             background-position: center;
             background-repeat: no-repeat;
         }
-
+        @media (max-width: 768px) {  /* Adjust breakpoint as needed */
+            .carousel-a, .carousel-b  {
+                background-size: cover;
+            }
+        }
         .carousel-a {
             /*background-color: rgba(255, 0, 0, 1);*/
             /* Semi-transparent red */
