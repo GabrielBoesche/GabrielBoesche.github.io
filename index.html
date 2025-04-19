@@ -178,7 +178,7 @@
         }
         .landing{
             display: grid;
-            background: linear-gradient(to bottom, rgba(6, 6, 6, 1), rgba(0, 0, 0, 1));
+            background: linear-gradient(to bottom, rgba(26, 26, 26, 1), rgba(2, 2, 2, 1));
             color: #f6f6f6;
             text-align:left;
             align-content: center;
@@ -188,9 +188,9 @@
             font-size: clamp(1rem, 2.5vw, 2rem); /* Fluid scaling */
             line-height: 1.2;
             padding-left: 5%;
-            padding-right: 10%;
+            padding-right: 7%;
             padding-bottom: 5%;
-            padding-top: 2.5%;
+            padding-top: 5%;
         }
     </style>
 </head>
@@ -226,14 +226,11 @@
     let is_carousel_out_of_focus = false;
     let is_at_frame_b = false;
     let is_animating = false;
-    let vertical_scroll_accumulator = 0.0;
     const animation_length_in_secs = 1.86;
     const tattoo_images_count = 4;
     const selfie_images_count = 4;
     let current_frame_image_index = 0;
     const max_zoom = 2.2;
-    const frame_a = getDom('carousel-a');
-    const frame_b = getDom('carousel-b');
 
     function getTattoImgString(inputNumber) {
         return 'tattoos/img' + inputNumber + '.jpg';
@@ -277,11 +274,11 @@
                 if (image) {
 
                     if (!is_at_frame_b) {
-                        gsap.set(frame_b, {
+                        gsap.set(getDom('carousel-b'), {
                             backgroundImage: `url('${image.src}')`
                         });
                     } else if (is_at_frame_b) {
-                        gsap.set(frame_a, {
+                        gsap.set(getDom('carousel-a'), {
                             backgroundImage: `url('${image.src}')`
                         });
                     }
@@ -298,10 +295,10 @@
 
     getCurrentFrame = function () {
         if (is_at_frame_b) {
-            return frame_b;
+            return getDom('carousel-b');
         }
         else {
-            return frame_a;
+            return getDom('carousel-a');
         }
     }
 
@@ -349,11 +346,10 @@
     animateNextImage = function() {
         if (is_animating) return; // Prevent concurrent animations
         //vertical_scroll_accumulator = 0;
-        animateButton(false);
         // Determine which frames to use
         const [fromFrame, toFrame] = is_at_frame_b 
-            ? [frame_b, frame_a] 
-            : [frame_a, frame_b];
+            ? [getDom('carousel-b'), getDom('carousel-a')] 
+            : [getDom('carousel-a'), getDom('carousel-b')];
         
         // Set initial states
         gsap.set(toFrame, {
@@ -394,11 +390,10 @@
     animatePreviousImage = function() {
         if (is_animating) return; // Prevent overlapping animations
         //vertical_scroll_accumulator = 0;
-        animateButton(true);
 
         const [activeFrame, inactiveFrame] = is_at_frame_b 
-            ? [frame_b, frame_a] 
-            : [frame_a, frame_b];
+            ? [getDom('carousel-b'), getDom('carousel-a')] 
+            : [getDom('carousel-a'), getDom('carousel-b')];
         
         // Set up initial states
         gsap.set(inactiveFrame, {
@@ -429,6 +424,7 @@
 
     nextCarouselImage = function () {
 
+        animateButton(false);
         if (is_animating) {
             return;
         }
@@ -442,6 +438,7 @@
 
 
     previousCarouselImage = function () {
+        animateButton(true);
         if (is_animating) {
             return;
         }
@@ -449,7 +446,7 @@
             current_frame_image_index = getSafeIndex(current_frame_image_index - 1, tattoo_images_count);
         }
 
-
+        
         asynchronouslyLoadImage(getTattoImgString(current_frame_image_index), animatePreviousImage);
     }
 
